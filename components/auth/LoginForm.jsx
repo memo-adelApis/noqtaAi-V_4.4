@@ -5,8 +5,9 @@ import { signIn } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import dynamic from "next/dynamic";
+import { BarChart3, Mail, Lock, Loader2, ArrowLeft } from "lucide-react";
 
-// استخدام dynamic import لـ react-toastify لتحسين أداء جانب الخادم (SSR)
+// استيراد Toast بشكل ديناميكي
 const ToastContainer = dynamic(
   () => import("react-toastify").then(mod => mod.ToastContainer),
   { ssr: false }
@@ -24,10 +25,9 @@ export default function LoginForm() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
-    toast.loading('جاري تسجيل الدخول...', { toastId: 'login' });
+    // toast.loading('جاري تسجيل الدخول...', { toastId: 'login' });
 
     try {
-      // نستخدم redirect: false للتحكم في عملية التوجيه يدويًا
       const result = await signIn('credentials', {
         redirect: false,
         email,
@@ -43,73 +43,122 @@ export default function LoginForm() {
       }
 
       toast.success('تم تسجيل الدخول بنجاح!');
-      
-      // *** التعديل الحاسم: توجيه المستخدم يدوياً. ***
-      // هذا الإجراء يجبر على تحديث الصفحة، مما يسمح للـ middleware بالعمل
-      // وقراءة الدور من الـ token وإعادة توجيهه للمسار الصحيح
-            router.push('/'); 
-
+      router.push('/'); 
       
     } catch (error) {
       toast.dismiss('login');
       toast.error('حدث خطأ غير متوقع أثناء تسجيل الدخول.');
       console.error(error);
-    } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <>
-      <form onSubmit={handleSubmit} className="space-y-6">
-        <div>
-          <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">البريد الإلكتروني</label>
-          <input
-            id="email"
-            name="email"
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            autoComplete="email"
-            required
-            className="w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-            disabled={isLoading}
-          />
+    <div className="min-h-screen bg-[#050608] flex items-center justify-center p-4 relative overflow-hidden font-sans" dir="rtl">
+      
+      {/* 1. خلفية جمالية (Gradients) */}
+      <div className="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] bg-indigo-600/20 rounded-full blur-[120px] opacity-50 pointer-events-none" />
+      <div className="absolute bottom-[-10%] right-[-10%] w-[500px] h-[500px] bg-purple-600/20 rounded-full blur-[120px] opacity-50 pointer-events-none" />
+
+      {/* 2. بطاقة تسجيل الدخول */}
+      <div className="w-full max-w-md bg-[#12141c] border border-gray-800/50 rounded-3xl p-8 shadow-2xl relative z-10 backdrop-blur-xl">
+        
+        {/* الشعار والعنوان */}
+        <div className="text-center mb-10">
+          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 shadow-lg mb-4 shadow-indigo-500/20">
+            <BarChart3 className="w-8 h-8 text-white" />
+          </div>
+          <h2 className="text-3xl font-bold text-white tracking-tight">
+            نقطة<span className="text-indigo-500">.ai</span>
+          </h2>
+          <p className="text-gray-400 mt-2 text-sm">
+            قم بتسجيل الدخول لمتابعة أعمالك بذكاء
+          </p>
         </div>
 
-        <div>
-          <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">كلمة المرور</label>
-          <input
-            id="password"
-            name="password"
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            autoComplete="current-password"
-            required
-            className="w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+        {/* النموذج */}
+        <form onSubmit={handleSubmit} className="space-y-5">
+          
+          {/* حقل البريد الإلكتروني */}
+          <div>
+            <label htmlFor="email" className="block text-xs font-medium text-gray-400 mb-1.5 mr-1">
+              البريد الإلكتروني
+            </label>
+            <div className="relative group">
+              <div className="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none text-gray-500 group-focus-within:text-indigo-500 transition-colors">
+                <Mail size={20} />
+              </div>
+              <input
+                id="email"
+                name="email"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                autoComplete="email"
+                required
+                placeholder="name@example.com"
+                className="w-full bg-[#0a0b0f] border border-gray-800 text-white rounded-xl py-3.5 pr-12 pl-4 placeholder:text-gray-600 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all shadow-inner"
+                disabled={isLoading}
+              />
+            </div>
+          </div>
+
+          {/* حقل كلمة المرور */}
+          <div>
+            <div className="flex justify-between items-center mb-1.5 mr-1">
+              <label htmlFor="password" className="block text-xs font-medium text-gray-400">
+                كلمة المرور
+              </label>
+            </div>
+            <div className="relative group">
+              <div className="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none text-gray-500 group-focus-within:text-indigo-500 transition-colors">
+                <Lock size={20} />
+              </div>
+              <input
+                id="password"
+                name="password"
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                autoComplete="current-password"
+                required
+                placeholder="••••••••"
+                className="w-full bg-[#0a0b0f] border border-gray-800 text-white rounded-xl py-3.5 pr-12 pl-4 placeholder:text-gray-600 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all shadow-inner"
+                disabled={isLoading}
+              />
+            </div>
+          </div>
+
+          {/* زر الدخول */}
+          <button
+            type="submit"
             disabled={isLoading}
-          />
+            className="w-full flex justify-center items-center py-4 px-4 border border-transparent rounded-xl shadow-lg shadow-indigo-600/20 text-sm font-bold text-white bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all transform hover:-translate-y-0.5 disabled:opacity-70 disabled:cursor-not-allowed mt-2"
+          >
+            {isLoading ? (
+              <>
+                <Loader2 className="animate-spin -ml-1 mr-2 h-5 w-5 text-white" />
+                جاري التحقق...
+              </>
+            ) : (
+              'تسجيل الدخول'
+            )}
+          </button>
+        </form>
+
+        {/* التذييل */}
+        <div className="text-center mt-8 pt-6 border-t border-gray-800/50">
+          <p className="text-sm text-gray-500">
+            ليس لديك حساب؟{' '}
+            <Link href="/register" className="font-bold text-indigo-400 hover:text-indigo-300 hover:underline transition-colors">
+              أنشئ حساباً جديداً
+            </Link>
+          </p>
         </div>
-
-        <button
-          type="submit"
-          disabled={isLoading}
-          className="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-base font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition duration-150 ease-in-out disabled:bg-gray-400"
-        >
-          {isLoading ? 'جاري الدخول...' : 'تسجيل الدخول'}
-        </button>
-      </form>
-
-      <div className="text-center mt-6">
-        <p className="text-sm text-gray-600">
-          ليس لديك حساب؟{' '}
-          <Link href="/register" className="font-medium text-blue-600 hover:text-blue-500">
-            سجل الآن
-          </Link>
-        </p>
+        
       </div>
-      <ToastContainer />
-    </>
+
+      <ToastContainer position="top-center" theme="dark" />
+    </div>
   );
 }

@@ -174,12 +174,12 @@ export default function DeveloperPage() {
                         <div className="p-6 rounded-xl bg-[#1c1d22] border border-gray-800 hover:border-blue-900/50 transition-colors group">
                             <Mail className="w-8 h-8 text-blue-500 mx-auto mb-4 group-hover:scale-110 transition-transform" />
                             <h4 className="text-white font-medium mb-1">البريد الإلكتروني</h4>
-                            <p className="text-sm text-gray-400">mahmoud@example.com</p>
+                            <p className="text-sm text-gray-400">adellvip6666@gmail.com</p>
                         </div>
                         <div className="p-6 rounded-xl bg-[#1c1d22] border border-gray-800 hover:border-emerald-900/50 transition-colors group">
                             <Phone className="w-8 h-8 text-emerald-500 mx-auto mb-4 group-hover:scale-110 transition-transform" />
                             <h4 className="text-white font-medium mb-1">الهاتف</h4>
-                            <p className="text-sm text-gray-400">+20 123 456 7890</p>
+                            <p className="text-sm text-gray-400">+20 1002840633  </p>
                         </div>
                         <div className="p-6 rounded-xl bg-[#1c1d22] border border-gray-800 hover:border-red-900/50 transition-colors group">
                             <MapPin className="w-8 h-8 text-red-500 mx-auto mb-4 group-hover:scale-110 transition-transform" />

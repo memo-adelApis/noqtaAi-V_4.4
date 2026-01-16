@@ -1,11 +1,12 @@
 import Link from "next/link";
-import { Eye } from "lucide-react";
+import { Eye, FileX, ArrowUpRight, ArrowDownLeft } from "lucide-react";
 
 // ✅ تنسيق العملة
-const formatCurrency = (amount, currency = "SAR") =>
-    new Intl.NumberFormat("ar-SA", {
+const formatCurrency = (amount, currency = "EGP") =>
+    new Intl.NumberFormat("ar-EG", {
         style: "currency",
         currency,
+        maximumFractionDigits: 2
     }).format(amount);
 
 // ✅ تنسيق التاريخ
@@ -14,29 +15,29 @@ const formatDate = (dateString) =>
         day: "2-digit",
         month: "short",
         year: "numeric",
-        numberingSystem: 'latn' // <--- هذا السطر يجبر الأرقام الإنجليزية (123)
+        numberingSystem: 'latn'
     });
 
-// ✅ شارة حالة احترافية
+// ✅ شارة حالة احترافية (Dark Mode Optimized)
 const StatusBadge = ({ status }) => {
     const styles = {
-        paid: "bg-green-100 text-green-700",
-        pending: "bg-yellow-100 text-yellow-700",
-        cancelled: "bg-gray-200 text-gray-700",
-        overdue: "bg-red-100 text-red-700",
-        draft: "bg-blue-100 text-blue-700",
+        paid: "bg-emerald-500/10 text-emerald-400 border-emerald-500/20",
+        pending: "bg-amber-500/10 text-amber-400 border-amber-500/20",
+        cancelled: "bg-gray-500/10 text-gray-400 border-gray-500/20",
+        overdue: "bg-red-500/10 text-red-400 border-red-500/20",
+        draft: "bg-blue-500/10 text-blue-400 border-blue-500/20",
     };
 
     const text = {
         paid: "مدفوعة",
-        pending: "قيد الانتظار",
+        pending: "معلقة",
         cancelled: "ملغاة",
         overdue: "متأخرة",
         draft: "مسودة",
     };
 
     return (
-        <span className={`px-3 py-1 text-xs font-semibold rounded-full ${styles[status] || "bg-gray-100 text-gray-700"}`}>
+        <span className={`px-3 py-1 text-xs font-bold rounded-full border ${styles[status] || "bg-gray-800 text-gray-400 border-gray-700"}`}>
             {text[status] || status}
         </span>
     );
@@ -44,70 +45,98 @@ const StatusBadge = ({ status }) => {
 
 export default function InvoicesTable({ invoices = [] }) {
     return (
-        <div className="overflow-hidden bg-white dark:bg-gray-900 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700">
-            <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                
-                {/* 🧩 رأس الجدول */}
-                <thead className="bg-gray-50 dark:bg-gray-800">
-                    <tr className="text-right text-gray-600 dark:text-gray-300 text-sm font-semibold">
-                        <th className="py-3 px-4">رقم الفاتورة</th>
-                        <th className="py-3 px-4">العميل / المورد</th>
-                        <th className="py-3 px-4">النوع</th>
-                        <th className="py-3 px-4">التاريخ</th>
-                        <th className="py-3 px-4">الإجمالي</th>
-                        <th className="py-3 px-4">الحالة</th>
-                        <th className="py-3 px-4 text-center">إجراءات</th>
-                    </tr>
-                </thead>
-
-                <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
-                    {invoices.length === 0 ? (
+        <div className="overflow-hidden bg-[#1c1d22] rounded-xl shadow-2xl border border-gray-800">
+            <div className="overflow-x-auto">
+                <table className="min-w-full divide-y divide-gray-800">
+                    
+                    {/* 🧩 رأس الجدول */}
+                    <thead className="bg-[#252830]">
                         <tr>
-                            <td colSpan={7} className="py-6 text-center text-gray-500 dark:text-gray-400">
-                                لا توجد فواتير مطابقة لخيارات البحث
-                            </td>
+                            <th className="py-4 px-6 text-right text-xs font-medium text-gray-400 uppercase tracking-wider">رقم الفاتورة</th>
+                            <th className="py-4 px-6 text-right text-xs font-medium text-gray-400 uppercase tracking-wider">العميل / المورد</th>
+                            <th className="py-4 px-6 text-right text-xs font-medium text-gray-400 uppercase tracking-wider">النوع</th>
+                            <th className="py-4 px-6 text-right text-xs font-medium text-gray-400 uppercase tracking-wider">التاريخ</th>
+                            <th className="py-4 px-6 text-right text-xs font-medium text-gray-400 uppercase tracking-wider">الإجمالي</th>
+                            <th className="py-4 px-6 text-right text-xs font-medium text-gray-400 uppercase tracking-wider">الحالة</th>
+                            <th className="py-4 px-6 text-center text-xs font-medium text-gray-400 uppercase tracking-wider">إجراءات</th>
                         </tr>
-                    ) : (
-                        invoices.map((invoice) => (
-                            <tr key={invoice._id} className="hover:bg-gray-50 dark:hover:bg-gray-800 transition">
-                                <td className="py-3 px-4 font-semibold text-gray-900 dark:text-gray-200">
-                                    {invoice.invoiceNumber}
-                                </td>
+                    </thead>
 
-                                <td className="py-3 px-4 text-gray-700 dark:text-gray-300">
-                                    {invoice.customerId?.name || invoice.supplierId?.name || "N/A"}
-                                </td>
-
-                                <td className="py-3 px-4">
-                                    {invoice.type === "revenue" ? "إيرادات" : "مصروفات"}
-                                </td>
-
-                                <td className="py-3 px-4">
-                                    {formatDate(invoice.createdAt)}
-                                </td>
-
-                                <td className="py-3 px-4 font-semibold">
-                                    {formatCurrency(invoice.totalInvoice, invoice.currencyCode)}
-                                </td>
-
-                                <td className="py-3 px-4">
-                                    <StatusBadge status={invoice.status} />
-                                </td>
-
-                                <td className="py-3 px-4 text-center">
-                                    <Link
-                                        href={`/subuser/invoices/${invoice._id}`}
-                                        className="inline-flex items-center gap-1 px-3 py-1 rounded-md border border-gray-300 dark:border-gray-600 text-sm hover:bg-gray-200 dark:hover:bg-gray-700 transition"
-                                    >
-                                        <Eye className="w-4 h-4" />
-                                        عرض
-                                    </Link>
+                    <tbody className="divide-y divide-gray-800 bg-[#1c1d22]">
+                        {invoices.length === 0 ? (
+                            <tr>
+                                <td colSpan={7} className="py-12 text-center text-gray-500">
+                                    <div className="flex flex-col items-center justify-center gap-3">
+                                        <div className="p-4 bg-gray-800/50 rounded-full">
+                                            <FileX size={32} className="text-gray-600" />
+                                        </div>
+                                        <p>لا توجد فواتير مطابقة للبحث</p>
+                                    </div>
                                 </td>
                             </tr>
-                        ))
-                    )}
-                </tbody>
-            </table>
+                        ) : (
+                            invoices.map((invoice) => {
+                                const isRevenue = invoice.type === 'revenue';
+                                
+                                return (
+                                    <tr key={invoice._id} className="hover:bg-[#292a30] transition-colors group">
+                                        
+                                        {/* رقم الفاتورة */}
+                                        <td className="py-4 px-6 whitespace-nowrap">
+                                            <span className="font-mono text-sm font-bold text-white group-hover:text-indigo-400 transition-colors">
+                                                {invoice.invoiceNumber}
+                                            </span>
+                                        </td>
+
+                                        {/* الاسم */}
+                                        <td className="py-4 px-6 whitespace-nowrap">
+                                            <div className="text-sm font-medium text-gray-200">
+                                                {invoice.customerId?.name || invoice.supplierId?.name || <span className="text-red-400 italic text-xs">غير معرف</span>}
+                                            </div>
+                                        </td>
+
+                                        {/* النوع */}
+                                        <td className="py-4 px-6 whitespace-nowrap">
+                                            <div className={`flex items-center gap-1 text-xs font-bold ${isRevenue ? 'text-emerald-400' : 'text-rose-400'}`}>
+                                                {isRevenue ? <ArrowDownLeft size={14} /> : <ArrowUpRight size={14} />}
+                                                {isRevenue ? "إيراد" : "مصروف"}
+                                            </div>
+                                        </td>
+
+                                        {/* التاريخ */}
+                                        <td className="py-4 px-6 whitespace-nowrap text-sm text-gray-400 font-mono">
+                                            {formatDate(invoice.createdAt)}
+                                        </td>
+
+                                        {/* الإجمالي */}
+                                        <td className="py-4 px-6 whitespace-nowrap">
+                                            <span className={`text-sm font-bold ${isRevenue ? 'text-white' : 'text-white'}`}>
+                                                {formatCurrency(invoice.totalInvoice, invoice.currencyCode)}
+                                            </span>
+                                        </td>
+
+                                        {/* الحالة */}
+                                        <td className="py-4 px-6 whitespace-nowrap">
+                                            <StatusBadge status={invoice.status} />
+                                        </td>
+
+                                        {/* الإجراءات */}
+                                        <td className="py-4 px-6 whitespace-nowrap text-center">
+                                            <Link
+                                                href={`/subuser/invoices/${invoice._id}`}
+                                                className="inline-flex items-center justify-center p-2 rounded-lg text-gray-400 hover:text-white hover:bg-gray-700/50 transition-all border border-transparent hover:border-gray-600"
+                                                title="عرض التفاصيل"
+                                            >
+                                                <Eye size={18} />
+                                            </Link>
+                                        </td>
+                                    </tr>
+                                );
+                            })
+                        )}
+                    </tbody>
+                </table>
+            </div>
         </div>
     );
 }

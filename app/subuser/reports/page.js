@@ -8,7 +8,6 @@ export default async function BranchReportPage() {
     
     // 1. جلب البيانات الأساسية والفواتير من السيرفر دفعة واحدة
     const result = await getMyBranchReportData();
-    console.log( "getMyBranchReportData result: ", result )
 
     // 2. التعامل مع الأخطاء
     if (!result.success) {

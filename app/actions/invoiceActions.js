@@ -10,20 +10,20 @@ import { unstable_noStore as noStore } from "next/cache";
 
 export async function createInvoiceAction(data) {
     try {
-        const user = await getCurrentUser();
+        const currentUser = await getCurrentUser();
   
-  // 1. فحص الاشتراك والقيود
-  const limitCheck = await checkSubscriptionLimits(user);
+//   // 1. فحص الاشتراك والقيود
+//   const limitCheck = await checkSubscriptionLimits(user);
   
-  if (limitCheck.restricted) {
-    // إذا كان الحساب مقيداً ووصل للحد الأقصى للفواتير
-    if (limitCheck.limits.invoices.isReached) {
-        return { 
-            success: false, 
-            message: "عفواً، لقد انتهت فترتك التجريبية وتجاوزت حد الـ 20 فاتورة. يرجى الترقية للمتابعة." 
-        };
-    }
-  }
+//   if (limitCheck.restricted) {
+//     // إذا كان الحساب مقيداً ووصل للحد الأقصى للفواتير
+//     if (limitCheck.limits.invoices.isReached) {
+//         return { 
+//             success: false, 
+//             message: "عفواً، لقد انتهت فترتك التجريبية وتجاوزت حد الـ 20 فاتورة. يرجى الترقية للمتابعة." 
+//         };
+//     }
+//   }
   //فحص الصلاحية
         if (!currentUser) throw new Error("401 - غير مصرح به");
         await connectToDB();

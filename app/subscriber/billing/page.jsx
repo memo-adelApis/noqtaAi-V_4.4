@@ -7,7 +7,7 @@ export default async function BillingPage() {
   const currentUser = await getCurrentUser();
   const user_id = currentUser._id
   const user = await User.findById(user_id).lean();
-  console.log("object" , user + "user_id" + user_id)
+ // console.log("object" , user + "user_id" + user_id)
   
   const subscription = user.subscription || {};
   const startDate = subscription.startDate ? new Date(subscription.startDate) : new Date();
@@ -113,7 +113,7 @@ export default async function BillingPage() {
                             <span className="bg-red-500/10 text-red-400 text-[10px] px-2 py-1 rounded border border-red-500/20">يقبل الكل</span>
                         </div>
                         <div className="text-center bg-black/20 p-2 rounded-lg mt-2 border border-white/5">
-                            <p className="text-lg font-mono font-bold text-white ltr tracking-widest" dir="ltr">010 1234 5678</p>
+                            <p className="text-lg font-mono font-bold text-white ltr tracking-widest" dir="ltr">01140558803</p>
                         </div>
                     </div>
 

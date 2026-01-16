@@ -26,10 +26,10 @@ export default async function ManageEmployeesPage() {
     const branches = branchesResult.data;
 
     return (
-        <div className="space-y-8" dir="rtl">
+        <div className="space-y-8 p-3 m-2" dir="rtl">
             
             {/* الهيدر */}
-            <div className="flex items-center gap-4 bg-[#1c1d22] p-6 rounded-xl border border-gray-800 shadow-lg">
+            <div className="flex items-center m-4 gap-4 bg-[#1c1d22] p-6 rounded-xl border border-gray-800 shadow-lg">
                 <div className="p-3 bg-blue-900/20 rounded-lg border border-blue-900/30">
                     <Users size={32} className="text-blue-500" />
                 </div>

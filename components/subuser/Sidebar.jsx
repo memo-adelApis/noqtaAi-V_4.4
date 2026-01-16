@@ -1,4 +1,3 @@
-// المسار: components/subuser/Sidebar.jsx
 "use client";
 
 import Link from 'next/link';
@@ -6,59 +5,53 @@ import { usePathname } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import { 
     Home, FileText, PlusCircle, Users, Truck, 
-    Building, LogOut, PieChart, ChevronDown 
+    Building, LogOut, PieChart, ChevronDown, Lock, X 
 } from 'lucide-react';
 import { signOut } from 'next-auth/react';
 
-// 1. تعريف هيكل الروابط (لتسهيل التعديل)
 const navItems = [
     {
         label: "القائمة الرئيسية",
         items: [
-            { href: "/subuser/home", label: "لوحة تحكم الفرع", icon: Home },
-            { href: "/subuser/reports", label: "تقرير أداء الفرع", icon: PieChart },
+            { href: "/subuser/home", label: "لوحة تحكم الفرع", icon: Home, alwaysShow: true },
+            { href: "/subuser/reports", label: "تقرير أداء الفرع", icon: PieChart, alwaysShow: false },
         ]
     },
     {
         label: "الفواتير",
         items: [
-            { href: "/subuser/invoices/add", label: "إضافة فاتورة", icon: PlusCircle },
-            { href: "/subuser/invoices", label: "قائمة الفواتير", icon: FileText },
+            { href: "/subuser/invoices/add", label: "إضافة فاتورة", icon: PlusCircle, alwaysShow: false },
+            { href: "/subuser/invoices", label: "قائمة الفواتير", icon: FileText, alwaysShow: false },
         ]
     },
     {
         label: "بيانات الفرع",
         items: [
-            { href: "/subuser/customers", label: "عملاء الفرع", icon: Users },
-            { href: "/subuser/suppliers", label: "موردي الفرع", icon: Truck },
-            { href: "/subuser/stores", label: "مخازن الفرع", icon: Building },
+            { href: "/subuser/customers", label: "عملاء الفرع", icon: Users, alwaysShow: false },
+            { href: "/subuser/suppliers", label: "موردي الفرع", icon: Truck, alwaysShow: false },
+            { href: "/subuser/stores", label: "مخازن الفرع", icon: Building, alwaysShow: false },
         ]
     }
 ];
 
-// 2. المكون الفرعي للروابط (الذي يعالج منطق الفتح/الإغلاق)
+// مكون العنصر الفرعي (تم تحديث الألوان للوضع الداكن)
 function SidebarItem({ item, isOpen, onClick }) {
     const pathname = usePathname();
-    
-    // هل هذا الرابط (أو أحد أبنائه) نشط؟
     const isParentActive = item.items.some(subItem => pathname.startsWith(subItem.href));
 
-    // للروابط المتداخلة (الأب)
     return (
-        <div className="text-right">
-            {/* زر القائمة الرئيسية (الأب) */}
+        <div className="text-right mb-2">
             <button
                 onClick={onClick}
                 className={`
                     flex items-center justify-between w-full px-4 py-3 text-sm font-medium
                     transition-colors duration-150 rounded-lg
                     ${isParentActive 
-                        ? 'text-blue-700 bg-blue-50' // لون الأب النشط
-                        : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'}
+                        ? 'text-blue-400 bg-blue-900/20' 
+                        : 'text-gray-400 hover:text-white hover:bg-gray-800'}
                 `}
             >
-                <span className="flex items-center">
-                    {/* (يمكن إضافة أيقونة للمجموعة هنا إن أردت، مثل: item.icon) */}
+                <span className="flex items-center gap-2">
                     {item.label}
                 </span>
                 <ChevronDown 
@@ -67,9 +60,8 @@ function SidebarItem({ item, isOpen, onClick }) {
                 />
             </button>
             
-            {/* القائمة الفرعية (الأبناء) */}
             {isOpen && (
-                <div className="mt-1 mr-4 space-y-1 border-r-2 border-gray-200">
+                <div className="mt-1 mr-4 space-y-1 border-r-2 border-gray-700 pr-2">
                     {item.items.map(subItem => {
                         const isActive = pathname === subItem.href;
                         return (
@@ -77,16 +69,13 @@ function SidebarItem({ item, isOpen, onClick }) {
                                 key={subItem.label}
                                 href={subItem.href}
                                 className={`
-                                    flex items-center w-full pr-4 py-2 text-sm font-medium
-                                    transition-colors duration-150
-                                    relative
+                                    flex items-center w-full px-2 py-2 text-sm font-medium
+                                    transition-colors duration-150 rounded-md
                                     ${isActive
-                                        ? 'text-blue-600 font-semibold' // لون الرابط النشط
-                                        : 'text-gray-500 hover:text-gray-800 hover:bg-gray-50'}
+                                        ? 'text-blue-400 bg-blue-900/10'
+                                        : 'text-gray-500 hover:text-gray-300 hover:bg-gray-800/50'}
                                 `}
                             >
-                                {/* الخط الأزرق للرابط النشط */}
-                                {isActive && <div className="absolute right-0 top-0 bottom-0 w-0.5 bg-blue-600 rounded-l-full"></div>}
                                 <subItem.icon size={16} className="ml-2 flex-shrink-0" />
                                 <span className="flex-1">{subItem.label}</span>
                             </Link>
@@ -98,12 +87,16 @@ function SidebarItem({ item, isOpen, onClick }) {
     );
 }
 
-// 3. المكون الرئيسي للشريط الجانبي
-export default function Sidebar() {
+// المكون الرئيسي (تم إضافة props التحكم)
+export default function Sidebar({ user, isOpen, onClose, isMobile }) {
     const pathname = usePathname();
     const [openMenu, setOpenMenu] = useState('');
 
-    // الفتح التلقائي للقائمة عند تحميل الصفحة
+    const subscription = user?.subscription || {};
+    const isActive = subscription.isActive;
+    const isExpired = subscription.endDate ? new Date(subscription.endDate) < new Date() : false;
+    const isServiceRunning = isActive && !isExpired;
+
     useEffect(() => {
         const activeParent = navItems.find(parent => 
             parent.items.some(child => pathname.startsWith(child.href))
@@ -119,33 +112,73 @@ export default function Sidebar() {
 
     return (
         <aside 
-            className="w-64 bg-white border-l border-gray-200 shadow-lg h-screen flex flex-col flex-shrink-0 hidden md:flex" 
+            className={`
+                fixed top-0 right-0 h-full w-64 bg-gray-900 border-l border-gray-800 shadow-2xl z-50
+                transform transition-transform duration-300 ease-in-out
+                ${isOpen ? "translate-x-0" : "translate-x-full"}
+            `}
             dir="rtl"
         >
-            <div className="flex items-center justify-center h-16 border-b">
+            {/* رأس القائمة */}
+            <div className="flex items-center justify-between h-16 px-6 border-b border-gray-800">
                 <Link href="/subuser/home">
-                    <span className="text-2xl font-bold text-blue-600">لوجـو</span>
+                    <span className="text-xl font-bold text-white tracking-wide">
+                        نقطة <span className="text-blue-500">AI</span>
+                    </span>
                 </Link>
+                {/* زر الإغلاق للموبايل */}
+                {isMobile && (
+                    <button 
+                        onClick={onClose}
+                        className="p-1 rounded-md text-gray-400 hover:text-white hover:bg-gray-800"
+                    >
+                        <X size={20} />
+                    </button>
+                )}
             </div>
 
-            <nav className="flex-1 p-4 space-y-2 overflow-y-auto">
-                {navItems.map(item => (
-                    <SidebarItem 
-                        key={item.label}
-                        item={item}
-                        isOpen={openMenu === item.label}
-                        onClick={() => handleMenuClick(item.label)}
-                    />
-                ))}
+            {/* تنبيه الخدمة */}
+            {!isServiceRunning && (
+                <div className="mx-4 mt-4 p-3 bg-red-900/20 border border-red-500/30 rounded-lg text-center animate-pulse">
+                    <p className="text-xs text-red-400 font-bold mb-1 flex items-center justify-center gap-1">
+                        <Lock size={12} /> الخدمة متوقفة
+                    </p>
+                    <p className="text-[10px] text-gray-500">
+                        يرجى مراجعة إدارة المؤسسة.
+                    </p>
+                </div>
+            )}
+
+            <nav className="flex-1 p-4 space-y-2 overflow-y-auto custom-scrollbar">
+                {navItems.map(item => {
+                    const visibleItems = item.items.filter(subItem => isServiceRunning || subItem.alwaysShow);
+                    if (visibleItems.length === 0) return null;
+                    const filteredItem = { ...item, items: visibleItems };
+
+                    return (
+                        <SidebarItem 
+                            key={item.label}
+                            item={filteredItem}
+                            isOpen={openMenu === item.label}
+                            onClick={() => handleMenuClick(item.label)}
+                        />
+                    );
+                })}
             </nav>
 
-            <div className="flex-grow"></div> 
-            <div className="p-4 border-t border-gray-200">
+            <div className="p-4 border-t border-gray-800 bg-gray-900/50">
+                <div className="mb-3 px-2">
+                    <p className="text-sm font-bold text-white truncate">{user?.name}</p>
+                    <p className="text-xs text-gray-500 truncate">{user?.email}</p>
+                    <span className="text-[10px] bg-blue-900/50 text-blue-300 px-2 py-0.5 rounded-full mt-1 inline-block border border-blue-800">
+                        {user?.role === 'manager' ? 'مدير فرع' : 'موظف'}
+                    </span>
+                </div>
                 <button
                     onClick={() => signOut({ callbackUrl: '/login' })}
-                    className="w-full flex items-center px-4 py-3 text-sm font-medium rounded-lg text-red-600 hover:bg-red-50 hover:text-red-700 transition-colors duration-150"
+                    className="w-full flex items-center px-4 py-2 text-sm font-medium rounded-lg text-red-400 hover:bg-red-900/20 transition-colors"
                 >
-                    <LogOut size={20} className="ml-3" />
+                    <LogOut size={18} className="ml-2" />
                     تسجيل الخروج
                 </button>
             </div>
